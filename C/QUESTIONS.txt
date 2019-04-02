@@ -1,0 +1,220 @@
+			   __________________
+
+			    LAB 03 QUESTIONS
+			   __________________
+
+
+- Name: (Adam Smith)
+- NetID: (THE smit8796 IN smit8796@umn.edu)
+
+Answer the questions below according to the lab specification. Write
+your answers directly in this text file and submit it to complete the
+lab.
+
+
+PROBLEM 1: C Text and Binary I/O
+================================
+
+  Examine the code blocks below which involve I/O with text and binary
+  data. Each example contains a logic error which will lead to
+  problems. Describe what the correction is and provide code if needed.
+
+
+A
+~
+
+  ,----
+  | FILE *fin = fopen(...,"r");
+  | int buf[4];             // store 4 ints from file in this array 
+  | fread(buf, 4, 1, fin);  // want to read 4 ints from fin into buf (error)
+  `----
+  Describe why the marked line is an error and provide a correction.
+
+  because fread()'s third argument is number of elements and it is being told to read only 1
+
+  fread(buf, sizeof(int), 4, fin);
+
+B
+~
+
+  ,----
+  | FILE *fout = fopen(...,"w");
+  | int length = ...;
+  | double *buf = malloc(length*sizeof(double)); 
+  | // fill in buf with values
+  | for(int i=0; i<length; i++){           // write ints from buf one at a time
+  |   fwrite(&buf[i], sizeof(double), 1, fout);   // error
+  | }
+  `----
+
+    because it will write into the first element of buf the whole time
+
+C
+~
+
+  ,----
+  | FILE *fin = fopen(...,"r");
+  | char buf[100];             // store up to 100 characters
+  | int pos = 0;
+  | while(1){
+  |   int result = fscanf(fin, "%d", &buf[pos]);
+  |   if(result == EOF){
+  |     break;
+  |   }
+  |   pos++;
+  | }
+  | // error in logic, may overflow buf: why?
+  `----
+
+    it will write over 100 chars in this while loop if the file has more than 100 chars
+
+D
+~
+
+  ,----
+  | // read two binary ints from given file, return pointer to them
+  | int *read_2_ints(char *fname){  
+  |   FILE *fin = fopen(fname,"r");
+  |   int buf[2];
+  |   fread(buf, sizeof(int), 2, fin);
+  |   return buf;  // compile error
+  | }
+  `----
+
+  returns the address of a local variable and need fclose() b4 u return and bc it is a local variable it is stored in
+  the stack and gets erased from the stack so you need to use malloc()
+
+
+PROBLEM 2: Number conversions
+=============================
+
+A
+~
+
+  Fill in the following table of equivalences.  Filling in the table
+  from top to bottom is advantageous as earlier rows can sometimes be
+  used to infer lower values. Feel free to make use of any ASCII table
+  or the table.c program provided in the week 3 lecture code pack.
+
+   Dec   Hex  Oct  Binary     Char         
+  -----------------------------------------
+     9  0x09   11  0000 1001  TAB          
+    10  0x10   12  0000 1010  \n (newline)
+    32  0x20   40  0010 0000  SPACE
+    50  0x32   62  0011 0010  2
+    65  0x41  101  0100 0001  A            
+    66  0x42  102  0100 0010  B
+    79  0x4F  117  0100 1111  O
+    80  0x50  120  0101 0000  P
+    91  0x5B  133  0101 1011  [
+    97  0x61  141  0110 0001  a
+   122  0x7A  172  0111 1010  z
+   145  0x91  221  1001 0001  none
+   160  0xA0  240  1010 0000  none
+   180  0xB4  264  1011 0100  none
+   255  0xFF  377  1111 1111  none
+
+
+B
+~
+
+  Fill in the bits, hex, and decimal values for the given examples. The
+  first example is completed for you. Assume all of these are 32 bit
+  unsigned integers.
+  ,----
+  | COMPLETED
+  | Binary:   0000 0000  0000 0000  0001 1000  1110 1001  
+  | 	      0    0     0    0     1    8     E    9
+  | Hex   :   0018E9
+  | Decimal:  6377
+  | 
+  | 
+  | NUMBER 1
+  | Binary:   0000 0000  0010 1111  0011 1010  1000 1101  
+  |
+  | Hex   :   17 3A8D
+  | Decimal:  1,522,317
+  | 
+  | 
+  | NUMBER 2
+  | Binary:   0111 1111 1000 0011 0101 1010 0000 1011
+  | 	      7    F    8    3    5    A    0    B
+  | Hex   :   7F835A0B
+  | Decimal:  2,139,314,699
+  `----
+
+
+PROBLEM 3: Signed Integer Conversions
+=====================================
+
+A
+~
+
+  Apply the steps involved in converting the following positive binary
+  number to it's two's complement negation in 8-bit signed
+  format. Recall the steps are
+  - Subtract 1
+  - Invert the bits
+  ,----
+  | 0111 1100  = 0x7C = 124 (decimal)
+  `----
+  The result is the two's complement representation of -124.
+
+  Reverse the process by
+  - Invert the bits
+  - Add one
+  to show that the original bits are gotten back.
+
+  0111 1100
+  0111 1011
+  1000 0100 = -124
+
+
+B
+~
+
+  Complete the following table of equivalences assuming 8-bit
+  twos-complement signed integers. The rightmost column is the inverse
+  of the binary representation: flip 1's to 0's, and vice versa.
+
+    Dec   Hex  Binary     Inverse   
+  ----------------------------------
+     +5  0x05  0000 0101  1111 1010 
+     -5  0xFB  1111 1011  0000 0100
+    +32  0x20  0010 0000  1101 1111
+    -32  0xE0  1110 0000  0001 1111
+   +127  0x7F  0111 1111  1000 0000
+   -127  0x81  1000 0001  0111 1110
+   -128  0x80  1000 0000  0111 1111
+     +2  0x02  0000 0010  1111 1101
+     -2  0xFE  1111 1110  0000 0001
+     +1  0x01  0000 0001  1111 1110
+     -1  0xFF  1111 1111  0000 0000
+      0  0x00  0000 0000  1111 1111
+
+
+PROBLEM 4: Converting Strings to Numbers
+========================================
+
+  Inspect the program in the lab pack called `convert.c'.  Compile and
+  run it using
+  ,----
+  | > gcc convert.c
+  | > ./a.out
+  `----
+  Describe briefly what kind of conversion is being done by the
+  `convert()' function given.
+  - A. What kind of data is input?
+  a string and an int both are pointers
+
+  - B. What result is produced by the function?
+  1 or 0
+
+  - C. How is a success versus an error reported?
+  success = 0 and error = 1
+
+  - D. Why is this kind of conversion needed?
+  to convert a string to an int possibly used for input
+
+  - E. What built-in C function does this conversion?
+  atoi()
